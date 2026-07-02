@@ -1,0 +1,16 @@
+{
+  "name": "model-eval",
+  "version": "1.0.0",
+  "description": "A structured evaluation of three Claude model tiers (Haiku 4.5, Sonnet 4.6, Opus 4.6) generating iOS/Swift code, plus a Haiku→Opus review pipeline that produces tighter code than either model alone.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "twitter-api-v2": "^1.29.0"
+  }
+}

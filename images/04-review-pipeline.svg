@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="system-ui, -apple-system, 'SF Pro Display', sans-serif">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg4)"/>
+
+  <text x="80" y="55" fill="#ffffff" font-size="28" font-weight="700">Haiku→Opus Review Pipeline</text>
+  <text x="80" y="82" fill="#94a3b8" font-size="15">Haiku drafts fast, Opus tightens. Compared to each model solo.</text>
+
+  <!-- Legend -->
+  <rect x="720" y="35" width="16" height="16" rx="3" fill="#f97316"/>
+  <text x="744" y="48" fill="#fdba74" font-size="14">Haiku Draft</text>
+  <rect x="870" y="35" width="16" height="16" rx="3" fill="#22c55e"/>
+  <text x="894" y="48" fill="#86efac" font-size="14">Opus Review</text>
+  <rect x="1010" y="35" width="16" height="16" rx="3" fill="#6366f1" stroke="#6366f1" stroke-width="1" fill-opacity="0.3"/>
+  <text x="1034" y="48" fill="#a5b4fc" font-size="14">Opus Solo</text>
+
+  <!-- Chart: grouped bars for each test -->
+  <!-- Scale: 400px height = 800 lines max, 1 line = 0.5px -->
+  <g transform="translate(80, 110)">
+    <!-- Grid lines -->
+    <text x="-10" y="5" fill="#64748b" font-size="12" text-anchor="end">800</text>
+    <line x1="0" y1="0" x2="1040" y2="0" stroke="#1e293b" stroke-width="1"/>
+    <text x="-10" y="105" fill="#64748b" font-size="12" text-anchor="end">600</text>
+    <line x1="0" y1="100" x2="1040" y2="100" stroke="#1e293b" stroke-width="1"/>
+    <text x="-10" y="205" fill="#64748b" font-size="12" text-anchor="end">400</text>
+    <line x1="0" y1="200" x2="1040" y2="200" stroke="#1e293b" stroke-width="1"/>
+    <text x="-10" y="305" fill="#64748b" font-size="12" text-anchor="end">200</text>
+    <line x1="0" y1="300" x2="1040" y2="300" stroke="#1e293b" stroke-width="1"/>
+    <line x1="0" y1="400" x2="1040" y2="400" stroke="#334155" stroke-width="1"/>
+    <text x="-10" y="405" fill="#64748b" font-size="12" text-anchor="end">0</text>
+
+    <!-- 1 line = 0.5px from bottom (400) -->
+
+    <!-- Test 01: Haiku=216, Reviewed=154, Opus Solo=135 -->
+    <g transform="translate(20, 0)">
+      <rect x="0" y="292" width="40" height="108" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="286" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">216</text>
+
+      <rect x="45" y="323" width="40" height="77" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="317" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">154</text>
+
+      <rect x="90" y="332.5" width="40" height="67.5" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="327" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">135</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">01 List</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-28%</text>
+    </g>
+
+    <!-- Test 02: Haiku=287, Reviewed=209, Opus Solo=240 -->
+    <g transform="translate(190, 0)">
+      <rect x="0" y="256.5" width="40" height="143.5" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="250" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">287</text>
+
+      <rect x="45" y="295.5" width="40" height="104.5" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="289" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">209</text>
+
+      <rect x="90" y="280" width="40" height="120" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="274" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">240</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">02 CRUD</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-27%</text>
+    </g>
+
+    <!-- Test 03: Haiku=426, Reviewed=336, Opus Solo=420 -->
+    <g transform="translate(360, 0)">
+      <rect x="0" y="187" width="40" height="213" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="181" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">426</text>
+
+      <rect x="45" y="232" width="40" height="168" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="226" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">336</text>
+
+      <rect x="90" y="190" width="40" height="210" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="184" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">420</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">03 Network</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-21%</text>
+    </g>
+
+    <!-- Test 04: Haiku=456, Reviewed=380, Opus Solo=404 -->
+    <g transform="translate(530, 0)">
+      <rect x="0" y="172" width="40" height="228" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="166" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">456</text>
+
+      <rect x="45" y="210" width="40" height="190" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="204" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">380</text>
+
+      <rect x="90" y="198" width="40" height="202" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="192" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">404</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">04 Layout</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-16%</text>
+    </g>
+
+    <!-- Test 05: Haiku=461, Reviewed=392, Opus Solo=801 -->
+    <g transform="translate(700, 0)">
+      <rect x="0" y="169.5" width="40" height="230.5" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="163" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">461</text>
+
+      <rect x="45" y="204" width="40" height="196" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="198" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">392</text>
+
+      <rect x="90" y="-0.5" width="40" height="400.5" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="-7" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">801</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">05 Combine</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-14%</text>
+    </g>
+
+    <!-- Test 06: Haiku=590, Reviewed=474, Opus Solo=587 -->
+    <g transform="translate(870, 0)">
+      <rect x="0" y="105" width="40" height="295" rx="4" fill="#f97316" opacity="0.85"/>
+      <text x="20" y="99" fill="#fdba74" font-size="12" text-anchor="middle" font-weight="600">590</text>
+
+      <rect x="45" y="163" width="40" height="237" rx="4" fill="#22c55e" opacity="0.85"/>
+      <text x="65" y="157" fill="#86efac" font-size="12" text-anchor="middle" font-weight="600">474</text>
+
+      <rect x="90" y="106.5" width="40" height="293.5" rx="4" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+      <text x="110" y="100" fill="#a5b4fc" font-size="12" text-anchor="middle" font-weight="600">587</text>
+
+      <text x="65" y="425" fill="#94a3b8" font-size="13" text-anchor="middle">06 Settings</text>
+      <text x="65" y="442" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="600">-19%</text>
+    </g>
+  </g>
+
+  <!-- Bottom annotation -->
+  <text x="80" y="600" fill="#475569" font-size="13">Green bars beat the Opus solo (dashed) bars in 5 of 6 tests. The review pipeline is more concise than the best model alone.</text>
+</svg>

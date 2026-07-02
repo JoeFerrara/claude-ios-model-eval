@@ -1,0 +1,24 @@
+# Archives
+*.zip
+
+# Environment variables (never commit real secrets; .env.example is allowed)
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# macOS
+.DS_Store
+._*
+
+# Project trash
+trash/

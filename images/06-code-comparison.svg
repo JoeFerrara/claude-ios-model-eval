@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="'SF Mono', 'Fira Code', 'Consolas', monospace">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="700" fill="url(#bg6)"/>
+
+  <text x="600" y="45" fill="#ffffff" font-size="24" font-weight="700" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">Same Prompt, Different Output</text>
+  <text x="600" y="70" fill="#94a3b8" font-size="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">AvatarView — SwiftUI contact list avatar component</text>
+
+  <!-- Haiku panel -->
+  <g transform="translate(30, 95)">
+    <!-- Window chrome -->
+    <rect x="0" y="0" width="555" height="30" rx="8" fill="#2a2a3e"/>
+    <rect x="0" y="15" width="555" height="15" fill="#2a2a3e"/>
+    <circle cx="18" cy="15" r="5" fill="#ff5f57"/>
+    <circle cx="36" cy="15" r="5" fill="#febc2e"/>
+    <circle cx="54" cy="15" r="5" fill="#28c840"/>
+    <text x="278" y="19" fill="#94a3b8" font-size="12" text-anchor="middle" font-family="system-ui, sans-serif">Haiku 4.5 — 25 lines</text>
+
+    <!-- Code background -->
+    <rect x="0" y="30" width="555" height="555" rx="0" fill="#1a1a2e"/>
+    <rect x="0" y="570" width="555" height="15" rx="0" fill="#1a1a2e"/>
+    <rect x="0" y="573" width="555" height="12" rx="8" fill="#1a1a2e"/>
+
+    <!-- Code -->
+    <text x="15" y="58" fill="#c792ea" font-size="13">struct</text>
+    <text x="62" y="58" fill="#82aaff" font-size="13">AvatarView</text>
+    <text x="145" y="58" fill="#89ddff" font-size="13">:</text>
+    <text x="155" y="58" fill="#ffcb6b" font-size="13">View</text>
+    <text x="183" y="58" fill="#89ddff" font-size="13">{</text>
+
+    <text x="30" y="78" fill="#c792ea" font-size="13">let</text>
+    <text x="55" y="78" fill="#eeffff" font-size="13">name:</text>
+    <text x="100" y="78" fill="#ffcb6b" font-size="13">String</text>
+
+    <text x="30" y="98" fill="#c792ea" font-size="13">let</text>
+    <text x="55" y="98" fill="#eeffff" font-size="13">size:</text>
+    <text x="93" y="98" fill="#ffcb6b" font-size="13">CGFloat</text>
+    <text x="150" y="98" fill="#89ddff" font-size="13">=</text>
+    <text x="162" y="98" fill="#f78c6c" font-size="13">50</text>
+
+    <text x="15" y="128" fill="#546e7a" font-size="13">// 10 lines to compute initials</text>
+
+    <text x="30" y="148" fill="#c792ea" font-size="13">private var</text>
+    <text x="115" y="148" fill="#eeffff" font-size="13">initials:</text>
+    <text x="180" y="148" fill="#ffcb6b" font-size="13">String</text>
+    <text x="223" y="148" fill="#89ddff" font-size="13">{</text>
+    <text x="40" y="168" fill="#c792ea" font-size="13">let</text>
+    <text x="65" y="168" fill="#eeffff" font-size="13">components = name.split(separator:</text>
+    <text x="370" y="168" fill="#c3e88d" font-size="13">" "</text>
+    <text x="385" y="168" fill="#eeffff" font-size="13">)</text>
+    <text x="40" y="188" fill="#c792ea" font-size="13">if</text>
+    <text x="58" y="188" fill="#eeffff" font-size="13">components.count >= 2 {</text>
+    <text x="50" y="208" fill="#c792ea" font-size="13">return</text>
+    <text x="100" y="208" fill="#eeffff" font-size="13">String(...) + String(...)</text>
+    <text x="40" y="228" fill="#eeffff" font-size="13">} else {</text>
+    <text x="50" y="248" fill="#c792ea" font-size="13">return</text>
+    <text x="100" y="248" fill="#eeffff" font-size="13">String(name.prefix(1))</text>
+    <text x="40" y="268" fill="#eeffff" font-size="13">}</text>
+    <text x="30" y="288" fill="#eeffff" font-size="13">}</text>
+
+    <text x="15" y="318" fill="#546e7a" font-size="13">// 5 lines for hash-based color</text>
+
+    <text x="30" y="338" fill="#c792ea" font-size="13">private var</text>
+    <text x="115" y="338" fill="#eeffff" font-size="13">backgroundColor:</text>
+    <text x="245" y="338" fill="#ffcb6b" font-size="13">Color</text>
+    <text x="278" y="338" fill="#89ddff" font-size="13">{ ... }</text>
+
+    <text x="15" y="368" fill="#546e7a" font-size="13">// Body uses deprecated APIs</text>
+
+    <text x="30" y="388" fill="#c792ea" font-size="13">var</text>
+    <text x="55" y="388" fill="#eeffff" font-size="13">body:</text>
+    <text x="93" y="388" fill="#c792ea" font-size="13">some</text>
+    <text x="130" y="388" fill="#ffcb6b" font-size="13">View</text>
+    <text x="158" y="388" fill="#89ddff" font-size="13">{</text>
+
+    <text x="40" y="408" fill="#82aaff" font-size="13">Circle()</text>
+    <text x="40" y="428" fill="#eeffff" font-size="13">  .fill(backgroundColor)</text>
+    <text x="40" y="448" fill="#eeffff" font-size="13">  .frame(width: size, height: size)</text>
+    <text x="40" y="468" fill="#eeffff" font-size="13">  .overlay(</text>
+    <text x="50" y="488" fill="#82aaff" font-size="13">    Text</text>
+    <text x="85" y="488" fill="#eeffff" font-size="13">(initials.uppercased())</text>
+    <text x="50" y="508" fill="#eeffff" font-size="13">      .</text>
+    <text x="62" y="508" fill="#ff5370" font-size="13">foregroundColor</text>
+    <text x="175" y="508" fill="#eeffff" font-size="13">(.white)</text>
+    <text x="40" y="528" fill="#eeffff" font-size="13">  )</text>
+    <text x="30" y="548" fill="#89ddff" font-size="13">}</text>
+    <text x="15" y="568" fill="#89ddff" font-size="13">}</text>
+
+    <!-- Deprecated warning -->
+    <rect x="55" y="498" width="135" height="3" fill="#ff5370" opacity="0.5" rx="1"/>
+  </g>
+
+  <!-- Opus panel -->
+  <g transform="translate(615, 95)">
+    <!-- Window chrome -->
+    <rect x="0" y="0" width="555" height="30" rx="8" fill="#2a2a3e"/>
+    <rect x="0" y="15" width="555" height="15" fill="#2a2a3e"/>
+    <circle cx="18" cy="15" r="5" fill="#ff5f57"/>
+    <circle cx="36" cy="15" r="5" fill="#febc2e"/>
+    <circle cx="54" cy="15" r="5" fill="#28c840"/>
+    <text x="278" y="19" fill="#86efac" font-size="12" text-anchor="middle" font-family="system-ui, sans-serif">Opus 4.6 — 10 lines</text>
+
+    <!-- Code background -->
+    <rect x="0" y="30" width="555" height="250" fill="#1a1a2e"/>
+    <rect x="0" y="268" width="555" height="12" rx="8" fill="#1a1a2e"/>
+
+    <!-- Code -->
+    <text x="15" y="58" fill="#c792ea" font-size="13">struct</text>
+    <text x="62" y="58" fill="#82aaff" font-size="13">AvatarView</text>
+    <text x="145" y="58" fill="#89ddff" font-size="13">:</text>
+    <text x="155" y="58" fill="#ffcb6b" font-size="13">View</text>
+    <text x="183" y="58" fill="#89ddff" font-size="13">{</text>
+
+    <text x="30" y="78" fill="#c792ea" font-size="13">let</text>
+    <text x="55" y="78" fill="#eeffff" font-size="13">initials:</text>
+    <text x="120" y="78" fill="#ffcb6b" font-size="13">String</text>
+
+    <text x="30" y="98" fill="#c792ea" font-size="13">var</text>
+    <text x="55" y="98" fill="#eeffff" font-size="13">size:</text>
+    <text x="93" y="98" fill="#ffcb6b" font-size="13">CGFloat</text>
+    <text x="150" y="98" fill="#89ddff" font-size="13">=</text>
+    <text x="162" y="98" fill="#f78c6c" font-size="13">44</text>
+
+    <text x="30" y="128" fill="#c792ea" font-size="13">var</text>
+    <text x="55" y="128" fill="#eeffff" font-size="13">body:</text>
+    <text x="93" y="128" fill="#c792ea" font-size="13">some</text>
+    <text x="130" y="128" fill="#ffcb6b" font-size="13">View</text>
+    <text x="158" y="128" fill="#89ddff" font-size="13">{</text>
+
+    <text x="40" y="148" fill="#82aaff" font-size="13">Text</text>
+    <text x="70" y="148" fill="#eeffff" font-size="13">(initials)</text>
+
+    <text x="50" y="168" fill="#eeffff" font-size="13">.font(.system(size: size * </text>
+    <text x="282" y="168" fill="#f78c6c" font-size="13">0.4</text>
+    <text x="307" y="168" fill="#eeffff" font-size="13">,</text>
+
+    <text x="75" y="188" fill="#eeffff" font-size="13">weight: .semibold))</text>
+
+    <text x="50" y="208" fill="#eeffff" font-size="13">.</text>
+    <text x="58" y="208" fill="#86efac" font-size="13">foregroundStyle</text>
+    <text x="175" y="208" fill="#eeffff" font-size="13">(.white)</text>
+
+    <text x="50" y="228" fill="#eeffff" font-size="13">.frame(width: size, height: size)</text>
+
+    <text x="50" y="248" fill="#eeffff" font-size="13">.background(.blue.gradient, in: .circle)</text>
+
+    <text x="30" y="268" fill="#89ddff" font-size="13">}</text>
+    <text x="15" y="288" fill="#89ddff" font-size="13">}</text>
+
+    <!-- Modern API highlight -->
+    <rect x="52" y="198" width="130" height="3" fill="#86efac" opacity="0.5" rx="1"/>
+  </g>
+
+  <!-- Annotations -->
+  <g transform="translate(615, 390)" font-family="system-ui, -apple-system, sans-serif">
+    <rect x="0" y="0" width="555" height="280" rx="12" fill="#1e1e36" stroke="#22c55e" stroke-width="1" opacity="0.7"/>
+    <text x="25" y="30" fill="#86efac" font-size="15" font-weight="600">Why Opus is better here:</text>
+
+    <circle cx="25" cy="60" r="4" fill="#22c55e"/>
+    <text x="38" y="65" fill="#eeffff" font-size="14">Takes pre-computed</text>
+    <text x="38" y="82" fill="#94a3b8" font-size="13">initials as input (better separation of concerns)</text>
+
+    <circle cx="25" cy="110" r="4" fill="#22c55e"/>
+    <text x="38" y="115" fill="#eeffff" font-size="14">Uses</text>
+    <text x="72" y="115" fill="#86efac" font-size="14" font-weight="600">.foregroundStyle</text>
+    <text x="240" y="115" fill="#eeffff" font-size="14">(modern API)</text>
+    <text x="38" y="132" fill="#94a3b8" font-size="13">instead of deprecated .foregroundColor</text>
+
+    <circle cx="25" cy="160" r="4" fill="#22c55e"/>
+    <text x="38" y="165" fill="#eeffff" font-size="14">Uses</text>
+    <text x="72" y="165" fill="#86efac" font-size="14" font-weight="600">.background(_:in:)</text>
+    <text x="252" y="165" fill="#eeffff" font-size="14">with ShapeStyle</text>
+    <text x="38" y="182" fill="#94a3b8" font-size="13">instead of Circle() + overlay pattern</text>
+
+    <circle cx="25" cy="210" r="4" fill="#22c55e"/>
+    <text x="38" y="215" fill="#eeffff" font-size="14">var size (configurable from callsite)</text>
+    <text x="38" y="232" fill="#94a3b8" font-size="13">Haiku uses let (requires new init to override)</text>
+
+    <circle cx="25" cy="260" r="4" fill="#22c55e"/>
+    <text x="38" y="265" fill="#eeffff" font-size="14">10 lines vs 25 — 60% smaller</text>
+  </g>
+</svg>

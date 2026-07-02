@@ -1,0 +1,526 @@
+import Foundation
+
+enum APIError: LocalizedError {
+    case badURL
+    case unauthorized
+    case serverError(Int)
+    case decodingFailed
+    case networkError(Error)
+    case rateLimited(retryAfter: TimeInterval)
+
+    var errorDescription: String? {
+        switch self {
+        case .badURL:
+            return "The URL is malformed or could not be constructed."
+        case .unauthorized:
+            return "Request is unauthorized. Check your credentials."
+        case .serverError(let code):
+            return "Server returned an error with status code \(code)."
+        case .decodingFailed:
+            return "Failed to decode the server response."
+        case .networkError(let error):
+            return "A network error occurred: \(error.localizedDescription)"
+        case .rateLimited(let retryAfter):
+            return "Rate limited. Retry after \(retryAfter) seconds."
+        }
+    }
+}
+
+// MARK: - Next Code Block
+
+/// Adopt this protocol to mutate outgoing requests before they are sent
+protocol RequestInterceptor {
+    func intercept(_ request: inout URLRequest) async throws
+}
+
+struct BearerTokenInterceptor: RequestInterceptor {
+    private let tokenProvider: () async throws -> String
+
+    init(tokenProvider: @escaping () async throws -> String) {
+        self.tokenProvider = tokenProvider
+    }
+
+    func intercept(_ request: inout URLRequest) async throws {
+        let token = try await tokenProvider()
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+    }
+}
+
+struct StaticHeadersInterceptor: RequestInterceptor {
+    let headers: [String: String]
+
+    func intercept(_ request: inout URLRequest) async throws {
+        for (field, value) in headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
+    }
+}
+
+// MARK: - Next Code Block
+
+struct CachedEntry {
+    let data: Data
+    let expiresAt: Date
+
+    var isExpired: Bool { Date() > expiresAt }
+}
+
+actor CacheManager {
+    private var store: [String: CachedEntry] = [:]
+    let defaultTTL: TimeInterval
+
+    init(defaultTTL: TimeInterval = 300) {
+        self.defaultTTL = defaultTTL
+    }
+
+    func set(_ data: Data, for key: String, ttl: TimeInterval? = nil) {
+        let expiry = Date().addingTimeInterval(ttl ?? defaultTTL)
+        store[key] = CachedEntry(data: data, expiresAt: expiry)
+    }
+
+    func get(for key: String) -> Data? {
+        guard let entry = store[key] else { return nil }
+        if entry.isExpired {
+            store.removeValue(forKey: key)
+            return nil
+        }
+        return entry.data
+    }
+
+    func invalidate(for key: String) {
+        store.removeValue(forKey: key)
+    }
+
+    func invalidateAll() {
+        store.removeAll()
+    }
+}
+
+// MARK: - Next Code Block
+
+// MARK: - HTTPMethod
+
+enum HTTPMethod: String {
+    case get    = "GET"
+    case post   = "POST"
+    case put    = "PUT"
+    case delete = "DELETE"
+}
+
+// MARK: - Sentinel types
+
+struct EmptyBody: Encodable {}
+struct EmptyResponse: Decodable {}
+
+// MARK: - APIRequest
+
+struct APIRequest<Body: Encodable> {
+    let path: String
+    let method: HTTPMethod
+    let queryItems: [URLQueryItem]?
+    let body: Body?
+    let headers: [String: String]?
+    let cacheTTL: TimeInterval?
+
+    init(
+        path: String,
+        method: HTTPMethod = .get,
+        queryItems: [URLQueryItem]? = nil,
+        body: Body? = nil,
+        headers: [String: String]? = nil,
+        cacheTTL: TimeInterval? = nil
+    ) {
+        self.path = path
+        self.method = method
+        self.queryItems = queryItems
+        self.body = body
+        self.headers = headers
+        self.cacheTTL = cacheTTL
+    }
+}
+
+extension APIRequest where Body == EmptyBody {
+    init(
+        path: String,
+        method: HTTPMethod = .get,
+        queryItems: [URLQueryItem]? = nil,
+        headers: [String: String]? = nil,
+        cacheTTL: TimeInterval? = nil
+    ) {
+        self.init(
+            path: path,
+            method: method,
+            queryItems: queryItems,
+            body: nil,
+            headers: headers,
+            cacheTTL: cacheTTL
+        )
+    }
+}
+
+// MARK: - Next Code Block
+
+// MARK: - Configuration
+
+struct APIClientConfiguration {
+    let baseURL: URL
+    let defaultHeaders: [String: String]
+    let timeoutInterval: TimeInterval
+    let maxRetries: Int
+
+    init(
+        baseURL: URL,
+        defaultHeaders: [String: String] = [
+            "Content-Type": "application/json",
+            "Accept":       "application/json"
+        ],
+        timeoutInterval: TimeInterval = 30,
+        maxRetries: Int = 3
+    ) {
+        self.baseURL = baseURL
+        self.defaultHeaders = defaultHeaders
+        self.timeoutInterval = timeoutInterval
+        self.maxRetries = maxRetries
+    }
+}
+
+// MARK: - APIClient
+
+final class APIClient {
+    private let configuration: APIClientConfiguration
+    private let session: URLSession
+    private let encoder: JSONEncoder
+    private let decoder: JSONDecoder
+    private let interceptors: [RequestInterceptor]
+    private let cache: CacheManager
+
+    init(
+        configuration: APIClientConfiguration,
+        interceptors: [RequestInterceptor] = [],
+        cache: CacheManager = CacheManager(),
+        session: URLSession = .shared,
+        encoder: JSONEncoder = JSONEncoder(),
+        decoder: JSONDecoder = JSONDecoder()
+    ) {
+        self.configuration = configuration
+        self.interceptors = interceptors
+        self.cache = cache
+        self.session = session
+        self.encoder = encoder
+        self.decoder = decoder
+    }
+
+    func send<Body: Encodable, Response: Decodable>(
+        _ request: APIRequest<Body>
+    ) async throws -> Response {
+        let urlRequest = try await buildURLRequest(from: request)
+        let cacheKey = urlRequest.url?.absoluteString ?? request.path
+
+        if request.method == .get, let cached = await cache.get(for: cacheKey) {
+            return try decode(cached)
+        }
+
+        let data = try await execute(urlRequest, retriesRemaining: configuration.maxRetries)
+
+        if request.method == .get, let ttl = request.cacheTTL {
+            await cache.set(data, for: cacheKey, ttl: ttl)
+        }
+
+        return try decode(data)
+    }
+
+    func get<Response: Decodable>(
+        _ path: String,
+        queryItems: [URLQueryItem]? = nil,
+        headers: [String: String]? = nil,
+        cacheTTL: TimeInterval? = nil
+    ) async throws -> Response {
+        try await send(APIRequest<EmptyBody>(
+            path: path,
+            method: .get,
+            queryItems: queryItems,
+            headers: headers,
+            cacheTTL: cacheTTL
+        ))
+    }
+
+    func post<Body: Encodable, Response: Decodable>(
+        _ path: String,
+        body: Body,
+        headers: [String: String]? = nil
+    ) async throws -> Response {
+        try await send(APIRequest(path: path, method: .post, body: body, headers: headers))
+    }
+
+    func put<Body: Encodable, Response: Decodable>(
+        _ path: String,
+        body: Body,
+        headers: [String: String]? = nil
+    ) async throws -> Response {
+        try await send(APIRequest(path: path, method: .put, body: body, headers: headers))
+    }
+
+    func delete<Response: Decodable>(
+        _ path: String,
+        queryItems: [URLQueryItem]? = nil,
+        headers: [String: String]? = nil
+    ) async throws -> Response {
+        try await send(APIRequest<EmptyBody>(
+            path: path,
+            method: .delete,
+            queryItems: queryItems,
+            headers: headers
+        ))
+    }
+
+    private func buildURLRequest<Body: Encodable>(
+        from request: APIRequest<Body>
+    ) async throws -> URLRequest {
+        guard var components = URLComponents(
+            url: configuration.baseURL.appendingPathComponent(request.path),
+            resolvingAgainstBaseURL: true
+        ) else {
+            throw APIError.badURL
+        }
+        components.queryItems = request.queryItems?.isEmpty == false ? request.queryItems : nil
+
+        guard let url = components.url else {
+            throw APIError.badURL
+        }
+
+        var urlRequest = URLRequest(url: url, timeoutInterval: configuration.timeoutInterval)
+        urlRequest.httpMethod = request.method.rawValue
+
+        for (field, value) in configuration.defaultHeaders {
+            urlRequest.setValue(value, forHTTPHeaderField: field)
+        }
+        for (field, value) in (request.headers ?? [:]) {
+            urlRequest.setValue(value, forHTTPHeaderField: field)
+        }
+
+        if let body = request.body {
+            urlRequest.httpBody = try encoder.encode(body)
+        }
+
+        for interceptor in interceptors {
+            try await interceptor.intercept(&urlRequest)
+        }
+
+        return urlRequest
+    }
+
+    private func execute(_ request: URLRequest, retriesRemaining: Int) async throws -> Data {
+        do {
+            let (data, response) = try await session.data(for: request)
+            try validate(response, data: data)
+            return data
+        } catch APIError.rateLimited(let retryAfter) {
+            guard retriesRemaining > 0 else { throw APIError.rateLimited(retryAfter: retryAfter) }
+            try await Task.sleep(for: .seconds(retryAfter))
+            return try await execute(request, retriesRemaining: retriesRemaining - 1)
+        } catch APIError.serverError(let code) where (500...599).contains(code) {
+            guard retriesRemaining > 0 else { throw APIError.serverError(code) }
+            let attempt = configuration.maxRetries - retriesRemaining
+            let delay = min(pow(2.0, Double(attempt)), 30)
+            try await Task.sleep(for: .seconds(delay))
+            return try await execute(request, retriesRemaining: retriesRemaining - 1)
+        } catch let apiError as APIError {
+            throw apiError
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
+
+    private func validate(_ response: URLResponse, data: Data) throws {
+        guard let http = response as? HTTPURLResponse else { return }
+        switch http.statusCode {
+        case 200...299:
+            return
+        case 401:
+            throw APIError.unauthorized
+        case 429:
+            let retryAfter = http.retryAfterSeconds ?? 60
+            throw APIError.rateLimited(retryAfter: retryAfter)
+        default:
+            throw APIError.serverError(http.statusCode)
+        }
+    }
+
+    private func decode<T: Decodable>(_ data: Data) throws -> T {
+        let source = data.isEmpty ? Data("{}".utf8) : data
+        do {
+            return try decoder.decode(T.self, from: source)
+        } catch {
+            throw APIError.decodingFailed
+        }
+    }
+}
+
+private extension HTTPURLResponse {
+    var retryAfterSeconds: TimeInterval? {
+        guard let value = value(forHTTPHeaderField: "Retry-After") else { return nil }
+        if let seconds = TimeInterval(value) { return seconds }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        guard let date = formatter.date(from: value) else { return nil }
+        return max(0, date.timeIntervalSinceNow)
+    }
+}
+
+// MARK: - Next Code Block
+
+struct GitHubRepo: Decodable, Identifiable {
+    let id: Int
+    let name: String
+    let fullName: String
+    let description: String?
+    let htmlUrl: String
+    let stargazersCount: Int
+    let forksCount: Int
+    let language: String?
+    let isPrivate: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, language
+        case fullName       = "full_name"
+        case htmlUrl        = "html_url"
+        case stargazersCount = "stargazers_count"
+        case forksCount     = "forks_count"
+        case isPrivate      = "private"
+    }
+}
+
+struct GitHubUser: Decodable {
+    let login: String
+    let name: String?
+    let publicRepos: Int
+    let followers: Int
+
+    enum CodingKeys: String, CodingKey {
+        case login, name, followers
+        case publicRepos = "public_repos"
+    }
+}
+
+// MARK: - Next Code Block
+
+final class GitHubService {
+    private let client: APIClient
+
+    init(token: String? = nil) {
+        let baseURL = URL(string: "https://api.github.com")!
+
+        var interceptors: [RequestInterceptor] = [
+            StaticHeadersInterceptor(headers: ["X-GitHub-Api-Version": "2022-11-28"])
+        ]
+        if let token {
+            interceptors.append(BearerTokenInterceptor(tokenProvider: { token }))
+        }
+
+        let config = APIClientConfiguration(
+            baseURL: baseURL,
+            defaultHeaders: [
+                "Content-Type": "application/json",
+                "Accept":       "application/vnd.github+json"
+            ]
+        )
+
+        client = APIClient(
+            configuration: config,
+            interceptors: interceptors,
+            cache: CacheManager(defaultTTL: 60)
+        )
+    }
+
+    func repos(
+        for username: String,
+        sort: String = "updated",
+        perPage: Int = 30
+    ) async throws -> [GitHubRepo] {
+        try await client.get(
+            "/users/\(username)/repos",
+            queryItems: [
+                URLQueryItem(name: "sort",     value: sort),
+                URLQueryItem(name: "per_page", value: String(perPage))
+            ],
+            cacheTTL: 300
+        )
+    }
+
+    func repo(owner: String, name: String) async throws -> GitHubRepo {
+        try await client.get("/repos/\(owner)/\(name)", cacheTTL: 300)
+    }
+
+    func user(_ username: String) async throws -> GitHubUser {
+        try await client.get("/users/\(username)", cacheTTL: 600)
+    }
+}
+
+// MARK: - Next Code Block
+
+import SwiftUI
+
+@MainActor
+final class ReposViewModel: ObservableObject {
+    @Published var repos: [GitHubRepo] = []
+    @Published var errorMessage: String?
+    @Published var isLoading = false
+
+    private let service: GitHubService
+
+    init(service: GitHubService = GitHubService()) {
+        self.service = service
+    }
+
+    func loadRepos(for username: String) async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            repos = try await service.repos(for: username)
+        } catch let error as APIError {
+            errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
+struct ReposView: View {
+    @StateObject private var vm = ReposViewModel()
+    private let username = "apple"
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if vm.isLoading {
+                    ProgressView("Loading...")
+                } else if let error = vm.errorMessage {
+                    ContentUnavailableView(error, systemImage: "exclamationmark.triangle")
+                } else {
+                    List(vm.repos) { repo in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(repo.name).font(.headline)
+                            if let desc = repo.description {
+                                Text(desc).font(.subheadline).foregroundStyle(.secondary)
+                            }
+                            HStack(spacing: 12) {
+                                Label("\(repo.stargazersCount)", systemImage: "star")
+                                Label("\(repo.forksCount)",      systemImage: "tuningfork")
+                                if let lang = repo.language {
+                                    Text(lang).font(.caption).foregroundStyle(.tertiary)
+                                }
+                            }
+                            .font(.caption)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+            }
+            .navigationTitle("\(username)'s Repos")
+            .task { await vm.loadRepos(for: username) }
+        }
+    }
+}
