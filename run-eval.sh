@@ -7,9 +7,13 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPTS_DIR="$SCRIPT_DIR/prompts"
-RESULTS_DIR="$SCRIPT_DIR/results"
+RESULTS_DIR="${EVAL_RESULTS_DIR:-$SCRIPT_DIR/results}"
 
-MODELS=("claude-haiku-4-5-20251001" "claude-sonnet-4-6" "claude-opus-4-6")
+# Override any tier with env vars, e.g. OPUS_MODEL=claude-opus-5-5 ./run-eval.sh
+HAIKU_MODEL="${HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+SONNET_MODEL="${SONNET_MODEL:-claude-sonnet-4-6}"
+OPUS_MODEL="${OPUS_MODEL:-claude-opus-4-6}"
+MODELS=("$HAIKU_MODEL" "$SONNET_MODEL" "$OPUS_MODEL")
 MODEL_NAMES=("haiku" "sonnet" "opus")
 
 # Parse --model flag
