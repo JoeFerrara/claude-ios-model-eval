@@ -1,5 +1,6 @@
-import re
 import os
+import re
+import sys
 
 def extract_swift_blocks(content):
     pattern = r'```swift\n(.*?)```'
@@ -28,8 +29,12 @@ def process_file(md_path, output_dir):
     print(f"  OK   {swift_filename}: {len(blocks)} block(s)")
     return True
 
-results_dir = '/Users/joeferrara/Developer/AI/nanoclaw_scratch/model-eval/results'
-output_dir = '/Users/joeferrara/Developer/AI/nanoclaw_scratch/model-eval/swift-previews'
+# Usage: python3 extract_swift.py [results_dir] [output_dir]
+# Defaults: results/ -> swift-previews/, relative to this script.
+# Example: python3 extract_swift.py results-v2 swift-previews-v2
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+results_dir = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else os.path.join(BASE_DIR, 'results')
+output_dir = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else os.path.join(BASE_DIR, 'swift-previews')
 
 os.makedirs(output_dir, exist_ok=True)
 

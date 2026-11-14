@@ -11,8 +11,12 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPTS_DIR="$SCRIPT_DIR/prompts"
-RESULTS_DIR="$SCRIPT_DIR/results-v2"
+RESULTS_DIR="${EVAL_RESULTS_DIR:-$SCRIPT_DIR/results-v2}"
 REVIEW_TEMPLATE="$PROMPTS_DIR/review-template.md"
+
+# Override with env vars, e.g. HAIKU_MODEL=claude-haiku-5-5 OPUS_MODEL=claude-opus-5-5 ./run-review.sh
+HAIKU_MODEL="${HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+OPUS_MODEL="${OPUS_MODEL:-claude-opus-4-6}"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -39,7 +43,7 @@ run_pipeline() {
     echo "  🔄 Step 1: Haiku drafting..."
     local start_time=$(date +%s)
 
-    claude --model claude-haiku-4-5-20251001 \
+    claude --model "$HAIKU_MODEL" \
       -p "$(cat "$prompt_file") Output all code directly in your response. Do not write any files." \
       --print \
       > "$haiku_file" 2>"$RESULTS_DIR/haiku-${test_name}.log"
@@ -69,7 +73,7 @@ run_pipeline() {
     local review_prompt="$(cat "$REVIEW_TEMPLATE")
 $(cat "$haiku_file")"
 
-    claude --model claude-opus-4-6 \
+    claude --model "$OPUS_MODEL" \
       -p "$review_prompt" \
       --print \
       > "$review_file" 2>"$RESULTS_DIR/opus-review-of-haiku-${test_name}.log"

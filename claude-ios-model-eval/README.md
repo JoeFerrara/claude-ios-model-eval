@@ -1,5 +1,7 @@
 # Claude Model Evaluation: iOS/Swift Code Generation
 
+> **Archived snapshot of the v1 run (March 2026).** Kept as originally shared. Its findings and price table are superseded: see the [top-level README](../README.md) for both runs, corrected findings and current status. The `articles/` folder listed below is no longer in this repo.
+
 ## What This Is
 
 A structured evaluation of three Claude model tiers (Haiku 4.5, Sonnet 4.6, Opus 4.6) generating iOS/Swift code, plus a Haiku→Opus review pipeline that produces tighter code than either model alone.

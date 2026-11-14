@@ -21,12 +21,8 @@ Copy this table for each test:
 | 01 | sonnet | /5 | /5 | /5 | /5 | /5 | /5 | /30 | | |
 | 01 | opus | /5 | /5 | /5 | /5 | /5 | /5 | /30 | | |
 
-## Cost Reference (per 1M tokens, as of March 2026)
+## Cost Reference
 
-| Model | Input | Output |
-|-------|-------|--------|
-| Haiku 4.5 | $0.80 | $4.00 |
-| Sonnet 4.6 | $3.00 | $15.00 |
-| Opus 4.6 | $15.00 | $75.00 |
+Use current per-token prices from [Anthropic's pricing page](https://www.anthropic.com/pricing) and the token counts from each run. (The March 2026 price table that used to be here is out of date.)
 
 Calculate cost-efficiency: **score / cost** — highest ratio wins.
