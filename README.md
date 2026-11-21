@@ -4,7 +4,11 @@
 
 A small evaluation harness that runs six iOS/Swift prompts of increasing complexity against three Claude model tiers (Haiku 4.5, Sonnet 4.6, Opus 4.6) through the Claude Code CLI. It also runs a **Haiku-draft → Opus-review pipeline** and compares the reviewed code with Haiku's draft and with Opus working alone.
 
-> **What the results do and don't show.** The numbers below measure **output length (lines) and generation time**, from **one sample per model per test**. The six-criterion quality rubric in [SCORING.md](SCORING.md) has not been applied yet, so nothing here establishes which model writes *better* code. Shorter is not automatically better: it can also mean missing error handling or tests.
+**Who did what.** I posed the question, ran both runs in March 2026 and decided to re-run with revised prompts. Claude Code chose the six features to test and wrote the scripts, prompts and scoring rubric from my meta-prompt (see [Build Your Own Evaluation](#build-your-own-evaluation)). Claude Opus 4.6 drafted my original March write-up. In November 2026 the findings below were recounted from the raw output files with Claude's help and corrected.
+
+**What the results do and don't show.** The numbers below measure **output length (lines) and generation time**, from **one sample per model per test**. The six-criterion quality rubric in [SCORING.md](SCORING.md) has not been applied yet, so nothing here establishes which model writes *better* code. Shorter is not automatically better: it can also mean missing error handling or tests.
+
+**About the March 2026 thread.** I posted these results on X in March 2026. That thread also reported compile results (Opus 6/6, Sonnet 5/6, Haiku 2/6) and v2 generation times. This repo has no compile script, per-file results or timing logs, so those figures can't be checked here and should be treated as unverified. The thread called the counts "lines of Swift"; they are lines of the whole response, including prose around the code.
 
 ## Quick Start
 
@@ -74,6 +78,8 @@ python3 extract_swift.py results-v3 swift-previews-v3
 
 `claude-ios-model-eval/` is an archived snapshot of the v1 run as originally shared. Because `prompts/` now holds the v2 prompts, running `run-eval.sh` today does not reproduce v1.
 
+The cards in `images/` and the README inside `claude-ios-model-eval/` are the March originals, kept as a record. They make claims about quality and value (for example "Skip Sonnet" and "beats Opus solo") that the results here don't support.
+
 ## Test Prompts
 
 | # | Test | Complexity | What It Covers |
@@ -89,7 +95,7 @@ python3 extract_swift.py results-v3 swift-previews-v3
 
 ### v2: lines of output (current prompts)
 
-v2 did not record generation times.
+The scripts print generation times to the terminal and don't save them, so v2 times are not in this repo.
 
 | Test | Haiku | Sonnet | Opus | Haiku→Opus review | Review vs. Haiku draft |
 |------|------:|-------:|-----:|------------------:|-----------------------:|
@@ -117,18 +123,18 @@ Bold marks the shortest output in each row.
 
 1. **Opus usually writes the shortest code.** It was the shortest of the three solo models in 5 of 6 v1 tests and 4 of 6 v2 tests.
 2. **Opus reliably shortens Haiku's drafts.** The review step cut Haiku's output by 15–29% in every test of both runs.
-3. **Whether the pipeline beats Opus alone depends on the prompts.** In v1 the reviewed code was shorter than Opus solo in 5 of 6 tests; in v2 it was shorter in only 2 of 6. Much of v1's gap came from test 05, where Opus wrote the requested unit tests (801 lines). Removing tests from the prompts in v2 largely erased the advantage.
+3. **The pipeline's advantage over Opus alone did not replicate.** In v1 the reviewed code was shorter than Opus solo in 5 of 6 tests; in v2 it was shorter in 2 of 6. The three tests that flipped (02, 03 and 04) never asked for unit tests. In those tests Haiku's v2 drafts came out longer than its v1 drafts (287→467, 426→540 and 456→536 lines), while Opus solo changed little (240→255, 420→424 and 404→372). Test 05, the only one that asked for unit tests in v1, favored the pipeline in both runs. With one sample per test, the difference may be run-to-run variation, and it can't be attributed to the prompt change.
 4. **Sonnet was the slowest model in every v1 test**, at 1.1–5.3× Opus's time. Its output was the longest of the three solo models in 4 of 6 v1 tests and 3 of 6 v2 tests. Without rubric scores, this says nothing about quality.
 
-The main lesson so far concerns method, not models: a single change to the prompts reversed the headline result, so line-count comparisons need fixed prompts, several samples and quality scoring before they support conclusions.
+The main lesson so far concerns method, not models: the headline result did not hold in a second run, so line-count comparisons need several samples per test and quality scoring before they support conclusions.
 
 ## Known Limitations and Next Steps
 
-- [ ] Score every output with the [SCORING.md](SCORING.md) rubric, starting with a compile check in Xcode
-- [ ] Run several samples per model per test to measure variance (currently n=1)
-- [ ] Record token usage and cost per run (needed for SCORING.md's score/cost ratio)
-- [ ] Record generation time in v2-style runs
-- [ ] Re-run on current models (see [Re-running With Newer Models](#re-running-with-newer-models))
+- Score every output with the [SCORING.md](SCORING.md) rubric, starting with a compile check in Xcode
+- Run several samples per model per test to measure variance (currently n=1)
+- Record token usage and cost per run (needed for SCORING.md's score/cost ratio)
+- Record generation time in v2-style runs
+- Re-run on current models (see [Re-running With Newer Models](#re-running-with-newer-models))
 
 ## Cost
 
